@@ -123,16 +123,15 @@ export default class App extends Component {
     // } else {
     //   host = '127.0.0.1';
     // }
-    let host = '127.0.0.1';
+    let host = 'wuan.pythonanywhere.com';
     let route = '';
-    let port = '5000';
     let url = '';
     let content_type = '';
     type === 'image'
       ? ((route = '/image'), (content_type = 'image/jpeg'))
       : ((route = '/video'), (content_type = 'video/mp4'));
-    url = schema + host + ':' + port + route;
-
+    url = schema + host + route;
+    console.log(url);
     let response = null;
     let config = {
       method: 'post',
@@ -143,6 +142,7 @@ export default class App extends Component {
       },
       data: mediaFile.base64,
     };
+
     try {
       response = await axios.request(config).then(
         () => console.log('Done'),
@@ -151,9 +151,6 @@ export default class App extends Component {
     } catch (e) {
       console.log(e);
     }
-
-    console.log(response.headers);
-    console.log(response.body);
   };
 
   render() {
