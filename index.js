@@ -157,7 +157,7 @@ export default class App extends Component {
 
   render() {
     return (
-      <ShowImageScreen/>
+      <MainScreen/>
       // <SafeAreaView style={styles.container}>
       //   {this.state.cameraRollPer ? (
       //     <Button
