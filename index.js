@@ -12,6 +12,8 @@ import * as ImagePicker from 'expo-image-picker';
 
 import DeviceInfo from 'react-native-device-info';
 import axios from 'axios';
+import MainScreen from './src/screens/MainScreen';
+import ShowImageScreen from './src/screens/ShowImageScreen';
 
 export default class App extends Component {
   constructor(props) {
@@ -155,25 +157,26 @@ export default class App extends Component {
 
   render() {
     return (
-      <SafeAreaView style={styles.container}>
-        {this.state.cameraRollPer ? (
-          <Button
-            title="Pick From Gallery"
-            disabled={this.state.disableButton}
-            onPress={async () => {
-              await this.pickMedia();
-              this.setState((s, p) => {
-                return {
-                  cameraRollPer: s.cameraRollPer,
-                  disableButton: false,
-                };
-              });
-            }}
-          />
-        ) : (
-          <Text>Camera Roll Permission Required ! </Text>
-        )}
-      </SafeAreaView>
+      <ShowImageScreen/>
+      // <SafeAreaView style={styles.container}>
+      //   {this.state.cameraRollPer ? (
+      //     <Button
+      //       title="Pick From Gallery"
+      //       disabled={this.state.disableButton}
+      //       onPress={async () => {
+      //         await this.pickMedia();
+      //         this.setState((s, p) => {
+      //           return {
+      //             cameraRollPer: s.cameraRollPer,
+      //             disableButton: false,
+      //           };
+      //         });
+      //       }}
+      //     />
+      //   ) : (
+      //     <Text>Camera Roll Permission Required ! </Text>
+      //   )}
+      // </SafeAreaView>
     );
   }
 }

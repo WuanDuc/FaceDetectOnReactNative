@@ -36,7 +36,7 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -51,5 +51,17 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Lato-Black_2.ttf</string>
+		<string>Lato-Bold_2.ttf</string>
+		<string>Lato-Hairline_2.ttf</string>
+		<string>Lato-Heavy_1.ttf</string>
+		<string>Lato-Italic_1.ttf</string>
+		<string>Lato-Light_3.ttf</string>
+		<string>Lato-Medium_0.ttf</string>
+		<string>Lato-Regular_2.ttf</string>
+		<string>Lato-Thin_0.ttf</string>
+	</array>
 </dict>
 </plist>
