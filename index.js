@@ -33,11 +33,6 @@ export default class App extends Component {
       };
     });
   }
-  isSimulator() {
-    // https://github.com/react-native-community/react-native-device-info#isemulator
-    return DeviceInfo.isEmulator();
-  }
-
   showAlert = () =>
     Alert.alert(
       'Connection Problem',
@@ -65,19 +60,6 @@ export default class App extends Component {
   //   });
   //   return base64;
   // };
-  uriToBase64 = async uri => {
-    console.log('URI:', uri);
-    try {
-      let base64 = await FS.readAsStringAsync(uri, {
-        encoding: FS.EncodingType.Base64,
-      });
-      return base64;
-    } catch (error) {
-      console.error('Error reading file:', error);
-      // Xử lý lỗi ở đây
-      return null;
-    }
-  };
 
   pickMedia = async () => {
     this.setState((state, props) => {
@@ -158,6 +140,7 @@ export default class App extends Component {
   render() {
     return (
       <MainScreen/>
+      //<ShowImageScreen />
       // <SafeAreaView style={styles.container}>
       //   {this.state.cameraRollPer ? (
       //     <Button
