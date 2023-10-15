@@ -117,7 +117,9 @@ const MainScreen = () => {
     } catch (e) {
       console.log(e);
     }
+    //GetImage();
   };
+
 
   useEffect(() => {
     //const status = await ImagePicker.requestMediaLibraryPermissionsAsync();
