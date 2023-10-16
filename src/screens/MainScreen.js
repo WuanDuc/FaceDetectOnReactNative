@@ -117,41 +117,22 @@ const MainScreen = () => {
       responseType: 'text',
     })
     .then(response => {
+      // do something
       console.log(response.data);
     })
     .catch(error => console.error(error));
-    // try {
-    //   response = await axios.request(config).then(
-    //     () => console.log(response),
-    //     e => console.log(e),
-    //   );
-    // } catch (e) {
-    //   console.log(e);
-    // }
-    //GetImage();
-  };
-  const GetImage = async () => {
-    let schema = 'http://';
-    let host = 'flaskapiserver.onrender.com';
-    let url = '';
-    let route = '/image';
-    url = schema + host + route;
-    console.log(url);
-    let response = null;
-    let config = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: url,
-    };
-
-    try {
-      response = await axios.request(config).then(
-        () => console.log(response.headers),
-        e => console.log(e),
-      );
-    } catch (e) {
-      console.log(e);
-    }
+    // THis is the way to turn the response data to image (Nguon: Wuan, tin chuan 100%)
+    // <Image
+    //   style={{ width: 200, height: 200 }}
+    //   source={{
+    //     uri: `data:${content_type};base64,${response.data}`,
+    //   }}
+    // />
+    //
+    // ** Next, Em U hay code sao cho neu cai ham cho do something chay thi se chuyen toi man hinh show anh 
+    //    voi cai chuoi binary tu anh la cua response.data
+    // XIN CAM ON
+    // WUAN
   };
 
   useEffect(() => {
