@@ -89,7 +89,7 @@ const MainScreen = () => {
     // } else {
     //   host = '127.0.0.1';
     // }
-    let host = 'flaskapiserver.onrender.co';
+    let host = 'flaskapiserver.onrender.com';
     let route = '';
     let url = '';
     let content_type = '';
@@ -98,7 +98,7 @@ const MainScreen = () => {
       : ((route = '/video'), (content_type = 'video/mp4'));
     url = schema + host + route;
     console.log(url);
-    let response = null;
+    //let response = null;
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -109,17 +109,50 @@ const MainScreen = () => {
       data: mediaFile.base64,
     };
 
+    axios({
+      url: url,
+      method: 'post',
+      data: config.data,
+      headers: config.headers,
+      responseType: 'text',
+    })
+    .then(response => {
+      console.log(response.data);
+    })
+    .catch(error => console.error(error));
+    // try {
+    //   response = await axios.request(config).then(
+    //     () => console.log(response),
+    //     e => console.log(e),
+    //   );
+    // } catch (e) {
+    //   console.log(e);
+    // }
+    //GetImage();
+  };
+  const GetImage = async () => {
+    let schema = 'http://';
+    let host = 'flaskapiserver.onrender.com';
+    let url = '';
+    let route = '/image';
+    url = schema + host + route;
+    console.log(url);
+    let response = null;
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: url,
+    };
+
     try {
       response = await axios.request(config).then(
-        () => console.log('done'),
+        () => console.log(response.headers),
         e => console.log(e),
       );
     } catch (e) {
       console.log(e);
     }
-    //GetImage();
   };
-
 
   useEffect(() => {
     //const status = await ImagePicker.requestMediaLibraryPermissionsAsync();

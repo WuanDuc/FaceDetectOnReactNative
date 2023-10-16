@@ -47,6 +47,7 @@ const ShowImageScreen = () => {
     }
   };
   
+  
   return (
     <View style={styles.container}>
       <View style={styles.mainView}>
