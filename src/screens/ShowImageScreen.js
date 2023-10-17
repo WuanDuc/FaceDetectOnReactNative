@@ -15,11 +15,12 @@ import {COLORS} from '../constants/color';
 import axios from 'axios';
 
 // create a component
-const ShowImageScreen = () => {
+const ShowImageScreen = ({props, route, navigation}) => {
   const {image, setImage} = useState(null);
 
   const ShowHistory = () => {
-    Alert.alert(image);
+    // Alert.alert(image);
+    GetImage();
   };
 
 

@@ -20,7 +20,7 @@ import DeviceInfo from 'react-native-device-info';
 import axios from 'axios';
 
 // create a component
-const MainScreen = () => {
+const MainScreen = ({props, route, navigation}) => {
   const [cameraRollPer, setCameraRollPer] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
 
@@ -28,6 +28,7 @@ const MainScreen = () => {
     await pickMedia();
     setCameraRollPer(cameraRollPer);
     setDisableButton(false);
+    navigation.navigate('ShowScreen');
   };
 
   const UploadVideo = () => {
