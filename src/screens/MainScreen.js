@@ -89,7 +89,7 @@ const MainScreen = () => {
     // } else {
     //   host = '127.0.0.1';
     // }
-    let host = 'flaskapiserver.onrender.co';
+    let host = 'flaskapiserver.onrender.com';
     let route = '';
     let url = '';
     let content_type = '';
@@ -98,7 +98,7 @@ const MainScreen = () => {
       : ((route = '/video'), (content_type = 'video/mp4'));
     url = schema + host + route;
     console.log(url);
-    let response = null;
+    //let response = null;
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -109,17 +109,31 @@ const MainScreen = () => {
       data: mediaFile.base64,
     };
 
-    try {
-      response = await axios.request(config).then(
-        () => console.log('done'),
-        e => console.log(e),
-      );
-    } catch (e) {
-      console.log(e);
-    }
-    //GetImage();
+    axios({
+      url: url,
+      method: 'post',
+      data: config.data,
+      headers: config.headers,
+      responseType: 'text',
+    })
+    .then(response => {
+      // do something
+      console.log(response.data);
+    })
+    .catch(error => console.error(error));
+    // THis is the way to turn the response data to image (Nguon: Wuan, tin chuan 100%)
+    // <Image
+    //   style={{ width: 200, height: 200 }}
+    //   source={{
+    //     uri: `data:${content_type};base64,${response.data}`,
+    //   }}
+    // />
+    //
+    // ** Next, Em U hay code sao cho neu cai ham cho do something chay thi se chuyen toi man hinh show anh 
+    //    voi cai chuoi binary tu anh la cua response.data
+    // XIN CAM ON
+    // WUAN
   };
-
 
   useEffect(() => {
     //const status = await ImagePicker.requestMediaLibraryPermissionsAsync();
