@@ -22,31 +22,6 @@ const ShowImageScreen = ({props, route, navigation}) => {
     // Alert.alert(image);
     GetImage();
   };
-
-
-  const GetImage = async () => {
-    let schema = 'http://';
-    let host = 'flaskapiserver.onrender.co';
-    let url = '';
-    let route = '/get_image';
-    url = schema + host + route;
-    console.log(url);
-    let response = null;
-    let config = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: url,
-    };
-
-    try {
-      response = await axios.request(config).then(
-        () => console.log(response.data),
-        e => console.log(e),
-      );
-    } catch (e) {
-      console.log(e);
-    }
-  };
   
   return (
     <View style={styles.container}>
