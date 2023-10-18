@@ -14,6 +14,8 @@ import DeviceInfo from 'react-native-device-info';
 import axios from 'axios';
 import MainScreen from './src/screens/MainScreen';
 import ShowImageScreen from './src/screens/ShowImageScreen';
+import { RootNavigation } from './src/routes';
+import { NavigationContainer } from '@react-navigation/native';
 
 export default class App extends Component {
   constructor(props) {
@@ -139,8 +141,11 @@ export default class App extends Component {
 
   render() {
     return (
-      <MainScreen/>
-      //<ShowImageScreen />
+      <NavigationContainer>
+        <RootNavigation />
+      </NavigationContainer>
+      // <MainScreen/>
+      // <ShowImageScreen />
       // <SafeAreaView style={styles.container}>
       //   {this.state.cameraRollPer ? (
       //     <Button
