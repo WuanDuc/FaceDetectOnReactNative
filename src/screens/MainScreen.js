@@ -10,7 +10,7 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import {IMG_HISTORY, IMG_UPLOAD} from '../assets/images';
+import {IMG_CAMERA, IMG_HISTORY, IMG_UPLOAD} from '../assets/images';
 import FONTS from '../constants/font';
 import {COLORS} from '../constants/color';
 import * as FS from 'expo-file-system';
@@ -25,10 +25,10 @@ const MainScreen = ({props, route, navigation}) => {
   const [disableButton, setDisableButton] = useState(false);
 
   const UploadImage = async () => {
-    await pickMedia();
-    setCameraRollPer(cameraRollPer);
-    setDisableButton(false);
-    navigation.navigate('ShowScreen');
+    await pickMedia()
+      .then (setCameraRollPer(cameraRollPer)) 
+      .then (setDisableButton(false))
+      // .then (navigation.navigate('ShowScreen', {dataType: 'image', data: 'abc'}))    
   };
 
   const UploadVideo = () => {
@@ -59,7 +59,7 @@ const MainScreen = ({props, route, navigation}) => {
       console.log('there is nothing');
       return;
     }
-    console.log('result:', result);
+    // console.log('result:', result);
     if (result.assets === null) {
       return;
     }
@@ -117,11 +117,12 @@ const MainScreen = ({props, route, navigation}) => {
       headers: config.headers,
       responseType: 'text',
     })
-    .then(response => {
-      // do something
-      console.log(response.data);
-    })
-    .catch(error => console.error(error));
+      .then(response => {
+        // do something
+        console.log(response.data);
+        navigation.navigate('ShowScreen', {dataType: 'image', data: response.data, content_type: content_type});
+      })
+      .catch(error => console.error(error));
     // THis is the way to turn the response data to image (Nguon: Wuan, tin chuan 100%)
     // <Image
     //   style={{ width: 200, height: 200 }}
@@ -163,8 +164,8 @@ const MainScreen = ({props, route, navigation}) => {
           <Image style={styles.buttonImage} source={IMG_UPLOAD} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={UploadVideo}>
-          <Text style={styles.text}>Upload Video</Text>
-          <Image style={styles.buttonImage} source={IMG_UPLOAD} />
+          <Text style={styles.text}>Use Camera</Text>
+          <Image style={styles.buttonImage} source={IMG_CAMERA} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>

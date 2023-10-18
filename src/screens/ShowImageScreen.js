@@ -16,11 +16,13 @@ import axios from 'axios';
 
 // create a component
 const ShowImageScreen = ({props, route, navigation}) => {
-  const {image, setImage} = useState(null);
+  const [image, setImage] = useState(null);
+
+  const {dataType, data, content_type} = route.params;
 
   const ShowHistory = () => {
     // Alert.alert(image);
-    GetImage();
+    // console.log(data);
   };
   
   return (
@@ -33,7 +35,14 @@ const ShowImageScreen = ({props, route, navigation}) => {
       </View>
       <Image
         style={styles.resultImage}
-        source={image == '' ? image : IMG_Loading}></Image>
+        source={{
+          uri: `data:${content_type};base64, ${data}`,}}></Image>
+      {/* <Image
+        style={{ width: 200, height: 200 }}
+        source={{
+          uri: `data:${content_type};base64,${response.data}`,
+        }}
+      /> */}
     </View>
   );
 };
