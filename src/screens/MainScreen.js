@@ -23,12 +23,12 @@ import axios from 'axios';
 const MainScreen = ({props, route, navigation}) => {
   const [cameraRollPer, setCameraRollPer] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(true);
   const UploadImage = async () => {
+    setIsLoading(false);
     await pickMedia()
       .then (setCameraRollPer(cameraRollPer)) 
       .then (setDisableButton(false))
-      // .then (navigation.navigate('ShowScreen', {dataType: 'image', data: 'abc'}))    
   };
 
   const UploadVideo = () => {
@@ -43,7 +43,8 @@ const MainScreen = ({props, route, navigation}) => {
       });
       return base64;
     } catch (error) {
-      console.error('Error reading file:', error);
+      console.log('Error reading file:', error);
+      Alert.alert('Lỗi video', 'Rất tiếc không thể sử dụng video này, vui lòng đổi sang file khác');
       // Xử lý lỗi ở đây
       return null;
     }
@@ -57,21 +58,22 @@ const MainScreen = ({props, route, navigation}) => {
     });
     if (result.canceled) {
       console.log('there is nothing');
+      setIsLoading(true);
       return;
     }
     // console.log('result:', result);
     if (result.assets === null) {
       return;
     }
-    if (result.type === 'Images') {
-      console.log('Image');
-      await this.toServer({
+    if (result.assets[0].type === 'image') {
+      console.log(result);
+      await toServer({
         type: result.assets[0].type,
         base64: result.assets[0].base64,
         uri: result.assets[0].uri,
       });
     } else {
-      //console.log('URI:', result.uri);
+      console.log(result.assets[0].type + " false");
       let base64 = await uriToBase64(result.assets[0].uri);
       await toServer({
         type: result.assets[0].type,
@@ -120,21 +122,14 @@ const MainScreen = ({props, route, navigation}) => {
       .then(response => {
         // do something
         console.log(response.data);
-        navigation.navigate('ShowScreen', {dataType: 'image', data: response.data, content_type: content_type});
+        navigation.navigate('ShowScreen', {dataType: 'video', data: response.data, content_type: content_type});
+        setIsLoading(true);
       })
-      .catch(error => console.error(error));
-    // THis is the way to turn the response data to image (Nguon: Wuan, tin chuan 100%)
-    // <Image
-    //   style={{ width: 200, height: 200 }}
-    //   source={{
-    //     uri: `data:${content_type};base64,${response.data}`,
-    //   }}
-    // />
-    //
-    // ** Next, Em U hay code sao cho neu cai ham cho do something chay thi se chuyen toi man hinh show anh 
-    //    voi cai chuoi binary tu anh la cua response.data
-    // XIN CAM ON
-    // WUAN
+      .catch(error => {
+        console.log(error);
+        Alert.alert('Lỗi tải file',"Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: " + error);
+        setIsLoading(true);
+      });
   };
 
   useEffect(() => {
@@ -151,23 +146,26 @@ const MainScreen = ({props, route, navigation}) => {
           marginTop: 20,
           alignItems: 'flex-end',
         }}>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <Image source={IMG_HISTORY} style={styles.historyImage} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <View style={styles.mainView}>
         <TouchableOpacity
-          style={styles.button}
+          style={isLoading ? styles.button : [styles.button, {backgroundColor: 'gray'}]}
           onPress={UploadImage}
-          disabled={disableButton}>
-          <Text style={styles.text}>Upload Photo</Text>
+          disabled={!isLoading}>
+          <Text style={styles.text}>Upload File</Text>
           <Image style={styles.buttonImage} source={IMG_UPLOAD} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={UploadVideo}>
+        <TouchableOpacity style={isLoading ? styles.button : [styles.button, {backgroundColor: 'gray'}]} 
+                          onPress={UploadVideo} 
+                          disabled={!isLoading}>
           <Text style={styles.text}>Use Camera</Text>
           <Image style={styles.buttonImage} source={IMG_CAMERA} />
         </TouchableOpacity>
       </View>
+      <Text style={[styles.waitingText, {opacity: isLoading ? 0 : 1}]}>Wait for the detection process ...</Text>
     </SafeAreaView>
   );
 };
@@ -189,10 +187,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    height: '100%',
+    height: '90%',
   },
   text: {
-    fontFamily: 'Lato-Bold_2',
+    fontFamily: FONTS.Lato.Bold,
     fontSize: 30,
     color: 'white',
     width: '80%',
@@ -212,6 +210,13 @@ const styles = StyleSheet.create({
     width: 62,
     height: 62,
   },
+  waitingText: {
+    color: COLORS.mainPurple, 
+    position: 'absolute', 
+    bottom: 10,
+    fontFamily: FONTS.Lato.Bold,
+    fontSize: 20,
+  }
 });
 
 //make this component available to the app
