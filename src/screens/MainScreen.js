@@ -236,7 +236,7 @@ const MainScreen = ({props, route, navigation}) => {
       })
         .then(response => {
           // do something
-          console.log(response.data);
+          console.log('Getting response...');
           if (route === '/image')
           {
             const value = JSON.parse(response.data);
