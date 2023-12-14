@@ -16,8 +16,14 @@ import {COLORS} from '../constants/color';
 import * as FS from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 
+import { Buffer } from 'buffer';
 import DeviceInfo from 'react-native-device-info';
 import axios from 'axios';
+import { AdvancedImage } from 'cloudinary-react-native';
+import { Cloudinary } from '@cloudinary/url-gen';
+import * as FileSystem from 'expo-file-system';
+
+
 
 // create a component
 const MainScreen = ({props, route, navigation}) => {
@@ -28,9 +34,21 @@ const MainScreen = ({props, route, navigation}) => {
     setIsLoading(false);
     await pickMedia()
       .then (setCameraRollPer(cameraRollPer)) 
-      .then (setDisableButton(false))
+      .then (setDisableButton(false));
   };
-
+  const cloudinary = new Cloudinary({
+    cloud: {
+        cloudName: 'dpej7xgsi',
+    },
+    url: {
+      secure: true,
+    },
+  });
+  const options = {
+    upload_preset: 'test_preset',
+    tag: 'test',
+    unsigned: true,
+  };
   const UploadVideo = () => {
     Alert.alert('Upload');
   };
@@ -66,32 +84,129 @@ const MainScreen = ({props, route, navigation}) => {
       return;
     }
     if (result.assets[0].type === 'image') {
-      console.log(result);
-      await toServer({
-        type: result.assets[0].type,
-        base64: result.assets[0].base64,
-        uri: result.assets[0].uri,
-      });
+      // console.log(result);
+      // await toServer({
+      //   type: result.assets[0].type,
+      //   base64: result.assets[0].base64,
+      //   uri: result.assets[0].uri,
+      //});
+
+      const uri = result.assets[0].uri;
+      const fileInfo = await FileSystem.getInfoAsync(uri);
+      const extension = fileInfo.uri.split('.').pop();
+      console.log(extension);
+      const type = result.assets[0].type + '/' + extension;
+      const name = uri.split('/').pop();
+      const source = {
+        uri,
+        type,
+        name,
+      };
+      //console.log(result.assets[0]);
+      await cloudinaryUploadImage(source);
     } else {
-      console.log(result.assets[0].type + " false");
-      let base64 = await uriToBase64(result.assets[0].uri);
-      await toServer({
-        type: result.assets[0].type,
-        base64: base64,
-        uri: result.assets[0].uri,
-      });
+      // console.log(result.assets[0].type + " false");
+      // let base64 = await uriToBase64(result.assets[0].uri);
+      // await toServer({
+      //   type: result.assets[0].type,
+      //   base64: base64,
+      //   uri: result.assets[0].uri,
+      // });
+      const uri = result.assets[0].uri;
+      const type = result.assets[0].type + '/mp4';
+      const name = uri.split('/').pop();
+      const source = {
+        uri,
+        type,
+        name,
+      };
+      console.log(source.name);
+      await cloudinaryUpload(source);
     }
   };
 
+  const cloudinaryUpdate = async photo => {
+    const data = new FormData();
+    data.append('file', photo);
+    data.append('upload_preset', 'videoApp');
+    data.append('cloud_name', 'dpej7xgsi');
+    fetch('https://api.cloudinary.com/v1_1/dpej7xgsi/video/upload/v1702289247/xlyelkfr75ccs4mp4mcw.mp4', {
+      method: 'PUT',
+      body: data,
+      headers: {
+        Accept: 'application/json',
+      },
+    }).then(res => res.json()).
+      then(data => {
+        console.log(data);
+        setIsLoading(true);
+      }).catch(error => {
+        console.log(error);
+        Alert.alert('Lỗi tải file','Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: ' + error);
+        setIsLoading(true);
+    });
+    };
+
+    const cloudinaryUploadImage = async photo => {
+      const data = new FormData();
+      data.append('file', photo);
+      data.append('upload_preset', 'videoApp');
+      data.append('cloud_name', 'dpej7xgsi');
+      fetch('https://api.cloudinary.com/v1_1/dpej7xgsi/image/upload', {
+        method: 'POST',
+        body: data,
+        headers: {
+          Accept: 'application/json',
+          'Content-Type' : 'multipart/form-data',
+        },
+      }).then(res => res.json()).
+        then(async data => {
+          console.log(data);
+          console.log('ok, go to server');
+          console.log(data.url);
+          await toServer({
+            type: 'image',
+            base64: data.url,
+            uri: data.url,
+          });
+        }).catch(error => {
+          console.log(error);
+          Alert.alert('Lỗi tải file','Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: ' + error);
+          setIsLoading(true);
+      });
+      };
+  const cloudinaryUpload = async photo => {
+    const data = new FormData();
+    data.append('file', photo);
+    data.append('upload_preset', 'videoApp');
+    data.append('cloud_name', 'dpej7xgsi');
+    fetch('https://api.cloudinary.com/v1_1/dpej7xgsi/video/upload', {
+      method: 'POST',
+      body: data,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type' : 'multipart/form-data',
+      },
+    }).then(res => res.json()).
+      then(async data => {
+        console.log(data);
+        console.log('ok, go to server');
+        console.log(data.url);
+        await toServer({
+          type: 'video',
+          base64: data.url,
+          uri: data.url,
+        });
+      }).catch(error => {
+        console.log(error);
+        Alert.alert('Lỗi tải file','Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: ' + error);
+        setIsLoading(true);
+    });
+    };
   const toServer = async mediaFile => {
     let type = mediaFile.type;
     let schema = 'http://';
-    //let host = '';
-    // if (this.isSimulator()) {
-    //   host = '10.0.2.2';
-    // } else {
-    //   host = '127.0.0.1';
-    // }
+    //let host = '10.0.2.2:5000';
     let host = 'flaskapiserver.onrender.com';
     let route = '';
     let url = '';
@@ -112,24 +227,48 @@ const MainScreen = ({props, route, navigation}) => {
       data: mediaFile.base64,
     };
 
-    axios({
-      url: url,
-      method: 'post',
-      data: config.data,
-      headers: config.headers,
-      responseType: 'text',
-    })
-      .then(response => {
-        // do something
-        console.log(response.data);
-        navigation.navigate('ShowScreen', {dataType: 'video', data: response.data, content_type: content_type});
-        setIsLoading(true);
+      axios({
+        url: url,
+        method: 'post',
+        data: config.data,
+        headers: config.headers,
+        responseType: 'text',
       })
-      .catch(error => {
-        console.log(error);
-        Alert.alert('Lỗi tải file',"Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: " + error);
-        setIsLoading(true);
-      });
+        .then(response => {
+          // do something
+          console.log(response.data);
+          if (route === '/image')
+          {
+            const value = JSON.parse(response.data);
+            const videoUrl = value['url'];
+            console.log(videoUrl);
+            fetch(videoUrl)
+            .then(res => res.arrayBuffer())
+            .then(buffer => {
+              const base64 = Buffer.from(buffer).toString('base64');
+              // do something with the base64 data
+              navigation.navigate('ShowScreen', {dataType: 'video', data: base64, content_type: content_type});
+            });
+          }
+          else {
+            const value = JSON.parse(response.data);
+            const videoUrl = value['url'];
+            console.log(videoUrl);
+            fetch(videoUrl)
+            .then(res => res.arrayBuffer())
+            .then(buffer => {
+              const base64 = Buffer.from(buffer).toString('base64');
+              // do something with the base64 data
+              navigation.navigate('ShowScreen', {dataType: 'video', data: base64, content_type: content_type});
+            });
+          }
+            setIsLoading(true);
+        })
+        .catch(error => {
+          console.log(error);
+          Alert.alert('Lỗi tải file','Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: ' + error);
+          setIsLoading(true);
+        });
   };
 
   useEffect(() => {
