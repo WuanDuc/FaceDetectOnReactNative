@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 //import liraries
-import React, {Component, useEffect, useState} from 'react';
+import React, {Component, useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -23,9 +23,15 @@ import axios from 'axios';
 const MainScreen = ({props, route, navigation}) => {
   const [cameraRollPer, setCameraRollPer] = useState(null);
   const [disableButton, setDisableButton] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [timeLoading, setTimeLoading] = useState(0);
+  const countRef = useRef(null);
   const UploadImage = async () => {
-    setIsLoading(false);
+    setIsLoading(true);
+    countRef.current = setInterval(() => {
+      setTimeLoading((timeLoading) => timeLoading + 1)
+    }, 1000)
+    setTimeLoading(0);
     await pickMedia()
       .then (setCameraRollPer(cameraRollPer)) 
       .then (setDisableButton(false))
@@ -58,7 +64,9 @@ const MainScreen = ({props, route, navigation}) => {
     });
     if (result.canceled) {
       console.log('there is nothing');
-      setIsLoading(true);
+      setIsLoading(false);
+      clearInterval(countRef.current);
+      setTimeLoading(0);
       return;
     }
     // console.log('result:', result);
@@ -123,12 +131,16 @@ const MainScreen = ({props, route, navigation}) => {
         // do something
         console.log(response.data);
         navigation.navigate('ShowScreen', {dataType: 'video', data: response.data, content_type: content_type});
-        setIsLoading(true);
+        setIsLoading(false);
+        clearInterval(countRef.current);
+        setTimeLoading(0);
       })
       .catch(error => {
         console.log(error);
         Alert.alert('Lỗi tải file',"Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: " + error);
-        setIsLoading(true);
+        setIsLoading(false);
+        clearInterval(countRef.current);
+        setTimeLoading(0);
       });
   };
 
@@ -152,20 +164,20 @@ const MainScreen = ({props, route, navigation}) => {
       </View>
       <View style={styles.mainView}>
         <TouchableOpacity
-          style={isLoading ? styles.button : [styles.button, {backgroundColor: 'gray'}]}
+          style={!isLoading ? styles.button : [styles.button, {backgroundColor: 'gray'}]}
           onPress={UploadImage}
-          disabled={!isLoading}>
+          disabled={isLoading}>
           <Text style={styles.text}>Upload File</Text>
           <Image style={styles.buttonImage} source={IMG_UPLOAD} />
         </TouchableOpacity>
-        <TouchableOpacity style={isLoading ? styles.button : [styles.button, {backgroundColor: 'gray'}]} 
+        <TouchableOpacity style={!isLoading ? styles.button : [styles.button, {backgroundColor: 'gray'}]} 
                           onPress={UploadVideo} 
-                          disabled={!isLoading}>
+                          disabled={isLoading}>
           <Text style={styles.text}>Use Camera</Text>
           <Image style={styles.buttonImage} source={IMG_CAMERA} />
         </TouchableOpacity>
       </View>
-      <Text style={[styles.waitingText, {opacity: isLoading ? 0 : 1}]}>Wait for the detection process ...</Text>
+      <Text style={[styles.waitingText, {opacity: isLoading ? 1 : 0}]}>{'Wait for the detection process ... (' + timeLoading + 's)'}</Text>
     </SafeAreaView>
   );
 };

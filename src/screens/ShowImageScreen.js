@@ -151,9 +151,9 @@ const styles = StyleSheet.create({
     height: '80%',
     width: '100%',
     resizeMode: 'contain',
-    borderWidth: 3,
-    borderColor: "purple",
-    borderRadius: 10,
+    // borderWidth: 3,
+    // borderColor: "purple",
+    // borderRadius: 10,
   },
 });
 
