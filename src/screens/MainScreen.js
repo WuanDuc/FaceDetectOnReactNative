@@ -10,20 +10,23 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import {IMG_CAMERA, IMG_HISTORY, IMG_UPLOAD} from '../assets/images';
+import {
+  IMG_APPICON,
+  IMG_CAMERA,
+  IMG_HISTORY,
+  IMG_UPLOAD,
+} from '../assets/images';
 import FONTS from '../constants/font';
 import {COLORS} from '../constants/color';
 import * as FS from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 
-import { Buffer } from 'buffer';
+import {Buffer} from 'buffer';
 import DeviceInfo from 'react-native-device-info';
 import axios from 'axios';
-import { AdvancedImage } from 'cloudinary-react-native';
-import { Cloudinary } from '@cloudinary/url-gen';
+import {AdvancedImage} from 'cloudinary-react-native';
+import {Cloudinary} from '@cloudinary/url-gen';
 import * as FileSystem from 'expo-file-system';
-
-
 
 // create a component
 const MainScreen = ({props, route, navigation}) => {
@@ -31,20 +34,21 @@ const MainScreen = ({props, route, navigation}) => {
   const [disableButton, setDisableButton] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [timeLoading, setTimeLoading] = useState(0);
+  const [uri, setUri] = useState();
   const countRef = useRef(null);
   const UploadImage = async () => {
     setIsLoading(true);
     countRef.current = setInterval(() => {
-      setTimeLoading((timeLoading) => timeLoading + 1)
-    }, 1000)
+      setTimeLoading(timeLoading => timeLoading + 1);
+    }, 1000);
     setTimeLoading(0);
     await pickMedia()
-      .then (setCameraRollPer(cameraRollPer)) 
-      .then (setDisableButton(false));
+      .then(setCameraRollPer(cameraRollPer))
+      .then(setDisableButton(false));
   };
   const cloudinary = new Cloudinary({
     cloud: {
-        cloudName: 'dpej7xgsi',
+      cloudName: 'dpej7xgsi',
     },
     url: {
       secure: true,
@@ -68,7 +72,10 @@ const MainScreen = ({props, route, navigation}) => {
       return base64;
     } catch (error) {
       console.log('Error reading file:', error);
-      Alert.alert('Lỗi video', 'Rất tiếc không thể sử dụng video này, vui lòng đổi sang file khác');
+      Alert.alert(
+        'Lỗi video',
+        'Rất tiếc không thể sử dụng video này, vui lòng đổi sang file khác',
+      );
       // Xử lý lỗi ở đây
       return null;
     }
@@ -92,13 +99,14 @@ const MainScreen = ({props, route, navigation}) => {
       return;
     }
     if (result.assets[0].type === 'image') {
-      // console.log(result);
+      console.log('uri', result.assets[0].uri);
       // await toServer({
       //   type: result.assets[0].type,
       //   base64: result.assets[0].base64,
       //   uri: result.assets[0].uri,
       //});
 
+      setUri(result.assets[0].uri);
       const uri = result.assets[0].uri;
       const fileInfo = await FileSystem.getInfoAsync(uri);
       const extension = fileInfo.uri.split('.').pop();
@@ -120,6 +128,7 @@ const MainScreen = ({props, route, navigation}) => {
       //   base64: base64,
       //   uri: result.assets[0].uri,
       // });
+      console.log(result);
       const uri = result.assets[0].uri;
       const type = result.assets[0].type + '/mp4';
       const name = uri.split('/').pop();
@@ -138,51 +147,70 @@ const MainScreen = ({props, route, navigation}) => {
     data.append('file', photo);
     data.append('upload_preset', 'videoApp');
     data.append('cloud_name', 'dpej7xgsi');
-    fetch('https://api.cloudinary.com/v1_1/dpej7xgsi/video/upload/v1702289247/xlyelkfr75ccs4mp4mcw.mp4', {
-      method: 'PUT',
-      body: data,
-      headers: {
-        Accept: 'application/json',
-      },
-    }).then(res => res.json()).
-      then(data => {
-        console.log(data);
-        setIsLoading(true);
-      }).catch(error => {
-        console.log(error);
-        Alert.alert('Lỗi tải file','Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: ' + error);
-        setIsLoading(true);
-    });
-    };
-
-    const cloudinaryUploadImage = async photo => {
-      const data = new FormData();
-      data.append('file', photo);
-      data.append('upload_preset', 'videoApp');
-      data.append('cloud_name', 'dpej7xgsi');
-      fetch('https://api.cloudinary.com/v1_1/dpej7xgsi/image/upload', {
-        method: 'POST',
+    fetch(
+      'https://api.cloudinary.com/v1_1/dpej7xgsi/video/upload/v1702289247/xlyelkfr75ccs4mp4mcw.mp4',
+      {
+        method: 'PUT',
         body: data,
         headers: {
           Accept: 'application/json',
-          'Content-Type' : 'multipart/form-data',
         },
-      }).then(res => res.json()).
-        then(async data => {
-          console.log(data);
-          console.log('ok, go to server');
-          console.log(data.url);
-          await toServer({
-            type: 'image',
-            base64: data.url,
-            uri: data.url,
-          });
-        }).catch(error => {
-          console.log(error);
-          Alert.alert('Lỗi tải file','Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: ' + error);
-          setIsLoading(true);
+      },
+    )
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        setIsLoading(true);
+      })
+      .catch(error => {
+        console.log(error);
+        Alert.alert(
+          'Lỗi tải file',
+          'Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: ' +
+            error,
+        );
+        setIsLoading(false);
+        clearInterval(countRef.current);
+        setTimeLoading(0);
       });
-      };
+  };
+
+  const cloudinaryUploadImage = async photo => {
+    const data = new FormData();
+    data.append('file', photo);
+    data.append('upload_preset', 'videoApp');
+    data.append('cloud_name', 'dpej7xgsi');
+    fetch('https://api.cloudinary.com/v1_1/dpej7xgsi/image/upload', {
+      method: 'POST',
+      body: data,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(async data => {
+        console.log(data);
+        console.log('ok, go to server');
+        console.log(data.url);
+        await toServer({
+          type: 'image',
+          base64: data.url,
+          uri: data.url,
+        });
+      })
+      .catch(error => {
+        console.log(error);
+        Alert.alert(
+          'Lỗi tải file',
+          'Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: ' +
+            error,
+        );
+        setIsLoading(false);
+        clearInterval(countRef.current);
+        setTimeLoading(0);
+      });
+  };
   const cloudinaryUpload = async photo => {
     const data = new FormData();
     data.append('file', photo);
@@ -193,10 +221,11 @@ const MainScreen = ({props, route, navigation}) => {
       body: data,
       headers: {
         Accept: 'application/json',
-        'Content-Type' : 'multipart/form-data',
+        'Content-Type': 'multipart/form-data',
       },
-    }).then(res => res.json()).
-      then(async data => {
+    })
+      .then(res => res.json())
+      .then(async data => {
         console.log(data);
         console.log('ok, go to server');
         console.log(data.url);
@@ -205,12 +234,19 @@ const MainScreen = ({props, route, navigation}) => {
           base64: data.url,
           uri: data.url,
         });
-      }).catch(error => {
+      })
+      .catch(error => {
         console.log(error);
-        Alert.alert('Lỗi tải file','Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: ' + error);
-        setIsLoading(true);
-    });
-    };
+        Alert.alert(
+          'Lỗi tải file',
+          'Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: ' +
+            error,
+        );
+        setIsLoading(false);
+        clearInterval(countRef.current);
+        setTimeLoading(0);
+      });
+  };
   const toServer = async mediaFile => {
     let type = mediaFile.type;
     let schema = 'http://';
@@ -235,48 +271,6 @@ const MainScreen = ({props, route, navigation}) => {
       data: mediaFile.base64,
     };
 
-      axios({
-        url: url,
-        method: 'post',
-        data: config.data,
-        headers: config.headers,
-        responseType: 'text',
-      })
-        .then(response => {
-          // do something
-          console.log('Getting response...');
-          if (route === '/image')
-          {
-            const value = JSON.parse(response.data);
-            const videoUrl = value['url'];
-            console.log(videoUrl);
-            fetch(videoUrl)
-            .then(res => res.arrayBuffer())
-            .then(buffer => {
-              const base64 = Buffer.from(buffer).toString('base64');
-              // do something with the base64 data
-              navigation.navigate('ShowScreen', {dataType: 'video', data: base64, content_type: content_type});
-            });
-          }
-          else {
-            const value = JSON.parse(response.data);
-            const videoUrl = value['url'];
-            console.log(videoUrl);
-            fetch(videoUrl)
-            .then(res => res.arrayBuffer())
-            .then(buffer => {
-              const base64 = Buffer.from(buffer).toString('base64');
-              // do something with the base64 data
-              navigation.navigate('ShowScreen', {dataType: 'video', data: base64, content_type: content_type});
-            });
-          }
-            setIsLoading(true);
-        })
-        .catch(error => {
-          console.log(error);
-          Alert.alert('Lỗi tải file','Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: ' + error);
-          setIsLoading(true);
-        });
     axios({
       url: url,
       method: 'post',
@@ -286,15 +280,56 @@ const MainScreen = ({props, route, navigation}) => {
     })
       .then(response => {
         // do something
-        console.log(response.data);
-        navigation.navigate('ShowScreen', {dataType: 'video', data: response.data, content_type: content_type});
-        setIsLoading(false);
-        clearInterval(countRef.current);
-        setTimeLoading(0);
+        console.log('Getting response...');
+        if (route === '/image') {
+          const value = JSON.parse(response.data);
+          const videoUrl = value['url'];
+          console.log(videoUrl);
+          fetch(videoUrl)
+            .then(res => res.arrayBuffer())
+            .then(buffer => {
+              const base64 = Buffer.from(buffer).toString('base64');
+              // do something with the base64 data
+              navigation.navigate('ShowScreen', {
+                dataType: uri,
+                data: base64,
+                content_type: content_type,
+              });
+            })
+            .then(buffer => {
+              setIsLoading(false);
+              clearInterval(countRef.current);
+              setTimeLoading(0);
+            });
+        } else {
+          const value = JSON.parse(response.data);
+          const videoUrl = value['url'];
+          console.log(videoUrl);
+          fetch(videoUrl)
+            .then(res => res.arrayBuffer())
+            .then(buffer => {
+              const base64 = Buffer.from(buffer).toString('base64');
+              // do something with the base64 data
+              navigation.navigate('ShowScreen', {
+                dataType: 'video',
+                data: base64,
+                content_type: content_type,
+              });
+            })
+            .then(buffer => {
+              setIsLoading(false);
+              clearInterval(countRef.current);
+              setTimeLoading(0);
+            });
+        }
       })
       .catch(error => {
         console.log(error);
-        Alert.alert('Lỗi tải file',"Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: " + error);
+        Alert.alert(
+          'Lỗi tải file',
+          'Quá trình tải file lên server gặp lỗi, vui lòng thử lại\nStatus code: ' +
+            error,
+        );
         setIsLoading(false);
         clearInterval(countRef.current);
         setTimeLoading(0);
@@ -302,7 +337,6 @@ const MainScreen = ({props, route, navigation}) => {
   };
 
   useEffect(() => {
-    //const status = await ImagePicker.requestMediaLibraryPermissionsAsync();
     setCameraRollPer(true), setDisableButton(false);
   }, []);
 
@@ -320,21 +354,33 @@ const MainScreen = ({props, route, navigation}) => {
         </TouchableOpacity> */}
       </View>
       <View style={styles.mainView}>
+        <Image source={IMG_APPICON} style={{marginBottom: 30}}></Image>
         <TouchableOpacity
-          style={!isLoading ? styles.button : [styles.button, {backgroundColor: 'gray'}]}
+          style={
+            !isLoading
+              ? styles.button
+              : [styles.button, {backgroundColor: 'gray'}]
+          }
           onPress={UploadImage}
           disabled={isLoading}>
           <Text style={styles.text}>Upload File</Text>
           <Image style={styles.buttonImage} source={IMG_UPLOAD} />
         </TouchableOpacity>
-        <TouchableOpacity style={!isLoading ? styles.button : [styles.button, {backgroundColor: 'gray'}]} 
-                          onPress={UploadVideo} 
-                          disabled={isLoading}>
+        <TouchableOpacity
+          style={
+            !isLoading
+              ? styles.button
+              : [styles.button, {backgroundColor: 'gray'}]
+          }
+          onPress={UploadVideo}
+          disabled={isLoading}>
           <Text style={styles.text}>Use Camera</Text>
-          <Image style={styles.buttonImage} source={IMG_CAMERA} />
+          <Image style={styles.buttonImage} source={IMG_UPLOAD} />
         </TouchableOpacity>
       </View>
-      <Text style={[styles.waitingText, {opacity: isLoading ? 1 : 0}]}>{'Wait for the detection process ... (' + timeLoading + 's)'}</Text>
+      <Text style={[styles.waitingText, {opacity: isLoading ? 1 : 0}]}>
+        {'Wait for the detection process ... (' + timeLoading + 's)'}
+      </Text>
     </SafeAreaView>
   );
 };
@@ -345,7 +391,7 @@ const styles = StyleSheet.create({
     flex: 1,
     // justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: COLORS.mainPurple,
   },
   historyImage: {
     width: 40,
@@ -361,14 +407,15 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: FONTS.Lato.Bold,
     fontSize: 30,
-    color: 'white',
+    color: COLORS.lightPurple,
     width: '80%',
+    color: COLORS.mainPurple,
   },
   button: {
     width: '83%',
     height: '11%',
     alignItems: 'center',
-    backgroundColor: COLORS.mainPurple,
+    backgroundColor: COLORS.lightPurple,
     flexDirection: 'row',
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -380,12 +427,12 @@ const styles = StyleSheet.create({
     height: 62,
   },
   waitingText: {
-    color: COLORS.mainPurple, 
-    position: 'absolute', 
+    color: COLORS.lightPurple,
+    position: 'absolute',
     bottom: 10,
     fontFamily: FONTS.Lato.Bold,
     fontSize: 20,
-  }
+  },
 });
 
 //make this component available to the app
