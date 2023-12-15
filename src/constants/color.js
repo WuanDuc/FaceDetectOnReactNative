@@ -1,4 +1,4 @@
-
 export const COLORS = {
-    mainPurple: '#BB9BEE'
-}
+  mainPurple: '#554A6D',
+  lightPurple: '#BB9BEE',
+};
