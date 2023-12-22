@@ -27,6 +27,7 @@ import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImagePicker from 'expo-image-picker';
+import scale from '../constants/responsive';
 
 // create a component
 const ShowImageScreen = ({props, route, navigation}) => {
@@ -151,6 +152,10 @@ const ShowImageScreen = ({props, route, navigation}) => {
     }
   }, []);
 
+  // if (status._j == null || status._j != null && status._j._j != null && !status._j._j.granted) {
+  //   return <Text>We need your library permi</Text>
+  // }
+
   return (
     <View style={styles.container}>
       <View style={styles.mainView}>
@@ -197,7 +202,7 @@ const ShowImageScreen = ({props, route, navigation}) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           width: '90%',
-          height: 80,
+          height: scale(80),
         }}>
         <TouchableOpacity style={styles.button} onPress={goBackToHome}>
           <Text style={[styles.text, {color: COLORS.mainPurple}]}>
@@ -220,8 +225,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.mainPurple,
   },
   mainView: {
-    marginTop: 50,
-    height: 70,
+    marginTop: scale(50),
+    height: scale(70),
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',

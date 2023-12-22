@@ -27,6 +27,7 @@ import axios from 'axios';
 import {AdvancedImage} from 'cloudinary-react-native';
 import {Cloudinary} from '@cloudinary/url-gen';
 import * as FileSystem from 'expo-file-system';
+import scale from '../constants/responsive';
 
 // create a component
 const MainScreen = ({props, route, navigation}) => {
@@ -82,6 +83,15 @@ const MainScreen = ({props, route, navigation}) => {
   };
 
   const pickMedia = async () => {
+    const permission = ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (
+      permission == null ||
+      (permission._j != null &&
+        permission._j._j != null &&
+        !permission._j._j.granted)
+    ) {
+      return;
+    }
     setCameraRollPer(cameraRollPer), setDisableButton(true);
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -344,9 +354,9 @@ const MainScreen = ({props, route, navigation}) => {
     <SafeAreaView style={styles.container}>
       <View
         style={{
-          height: 50,
+          height: scale(50),
           width: '100%',
-          marginTop: 20,
+          marginTop: scale(20),
           alignItems: 'flex-end',
         }}>
         {/* <TouchableOpacity>
@@ -419,7 +429,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 10,
     paddingVertical: 5,
-    marginBottom: 30,
+    marginBottom: scale(30),
     borderRadius: 23,
   },
   buttonImage: {
