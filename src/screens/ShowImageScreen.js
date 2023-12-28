@@ -20,20 +20,17 @@ import {
 } from '../assets/images';
 import FONTS from '../constants/font';
 import {COLORS} from '../constants/color';
-import axios from 'axios';
-import {WebView} from 'react-native-webview';
 import {Video, ResizeMode} from 'expo-av';
 import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
 import * as MediaLibrary from 'expo-media-library';
-import * as ImagePicker from 'expo-image-picker';
 import scale from '../constants/responsive';
 
 // create a component
 const ShowImageScreen = ({props, route, navigation}) => {
-  const [status, requestPermission] = useState(
-    ImagePicker.requestMediaLibraryPermissionsAsync(),
-  );
+  // const [status, requestPermission] = useState(
+  //   ImagePicker.requestMediaLibraryPermissionsAsync(),
+  // );
 
   const {dataType, data, content_type} = route.params;
 
@@ -52,28 +49,28 @@ const ShowImageScreen = ({props, route, navigation}) => {
   };
 
   const SaveData = async () => {
-    if (status._j != null && status._j._j != null && status._j._j.granted) {
-      if (content_type === 'video/mp4') {
-        await MediaLibrary.saveToLibraryAsync(
-          `file://${RNFS.DocumentDirectoryPath}/video.mp4`,
-        ).finally(() => {
-          Alert.alert('Thông báo', 'Lưu video thành công');
-        });
-      } else {
-        await MediaLibrary.saveToLibraryAsync(
-          `file://${RNFS.DocumentDirectoryPath}/image.jpg`,
-        ).finally(() => {
-          Alert.alert('Thông báo', 'Lưu ảnh thành công');
-        });
-      }
+    // if (status._j != null && status._j._j != null && status._j._j.granted) {
+    if (content_type === 'video/mp4') {
+      await MediaLibrary.saveToLibraryAsync(
+        `file://${RNFS.DocumentDirectoryPath}/video.mp4`,
+      ).finally(() => {
+        Alert.alert('Thông báo', 'Lưu video thành công');
+      });
     } else {
-      console.log('No permission', status);
-      async () => {
-        requestPermission(
-          await ImagePicker.requestMediaLibraryPermissionsAsync(),
-        );
-      };
+      await MediaLibrary.saveToLibraryAsync(
+        `file://${RNFS.DocumentDirectoryPath}/image.jpg`,
+      ).finally(() => {
+        Alert.alert('Thông báo', 'Lưu ảnh thành công');
+      });
     }
+    // } else {
+    //   console.log('No permission', status);
+    //   async () => {
+    //     requestPermission(
+    //       await ImagePicker.requestMediaLibraryPermissionsAsync(),
+    //     );
+    //   };
+    // }
   };
 
   function b64toblob(b64data, contenttype, slicesize) {
@@ -139,17 +136,17 @@ const ShowImageScreen = ({props, route, navigation}) => {
       downloadToFileImage(data);
     }
 
-    console.log(status);
+    // console.log(status);
 
-    if (status._j == null) {
-      requestPermission(ImagePicker.requestMediaLibraryPermissionsAsync());
-    }
+    // if (status._j == null) {
+    //   requestPermission(ImagePicker.requestMediaLibraryPermissionsAsync());
+    // }
 
-    if (status._j != null && status._j._j != null && !status._j._j.granted) {
-      (async () => {
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      })();
-    }
+    // if (status._j != null && status._j._j != null && !status._j._j.granted) {
+    //   (async () => {
+    //     await ImagePicker.requestMediaLibraryPermissionsAsync();
+    //   })();
+    // }
   }, []);
 
   // if (status._j == null || status._j != null && status._j._j != null && !status._j._j.granted) {
