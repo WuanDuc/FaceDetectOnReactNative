@@ -10,12 +10,7 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import {
-  IMG_APPICON,
-  IMG_CAMERA,
-  IMG_HISTORY,
-  IMG_UPLOAD,
-} from '../assets/images';
+import {IMG_APPICON, IMG_UPLOAD} from '../assets/images';
 import FONTS from '../constants/font';
 import {COLORS} from '../constants/color';
 import * as FS from 'expo-file-system';
@@ -38,6 +33,15 @@ const MainScreen = ({props, route, navigation}) => {
   const [uri, setUri] = useState();
   const countRef = useRef(null);
   const UploadImage = async () => {
+    console.log('acb');
+    await ImagePicker.requestCameraPermissionsAsync();
+    const permission = await ImagePicker.getCameraPermissionsAsync();
+    permission.canAskAgain = true;
+    console.log(permission);
+    if (permission == null || !permission.granted) {
+      Alert.alert("We don't have Media Library Permission!");
+      return;
+    }
     setIsLoading(true);
     countRef.current = setInterval(() => {
       setTimeLoading(timeLoading => timeLoading + 1);
@@ -61,7 +65,7 @@ const MainScreen = ({props, route, navigation}) => {
     unsigned: true,
   };
   const UploadVideo = () => {
-    Alert.alert('Upload');
+    Alert.alert('This feature will be updated soon!');
   };
 
   const uriToBase64 = async uri => {
@@ -83,15 +87,6 @@ const MainScreen = ({props, route, navigation}) => {
   };
 
   const pickMedia = async () => {
-    const permission = ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (
-      permission == null ||
-      (permission._j != null &&
-        permission._j._j != null &&
-        !permission._j._j.granted)
-    ) {
-      return;
-    }
     setCameraRollPer(cameraRollPer), setDisableButton(true);
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -358,11 +353,7 @@ const MainScreen = ({props, route, navigation}) => {
           width: '100%',
           marginTop: scale(20),
           alignItems: 'flex-end',
-        }}>
-        {/* <TouchableOpacity>
-          <Image source={IMG_HISTORY} style={styles.historyImage} />
-        </TouchableOpacity> */}
-      </View>
+        }}></View>
       <View style={styles.mainView}>
         <Image source={IMG_APPICON} style={{marginBottom: 30}}></Image>
         <TouchableOpacity
@@ -374,17 +365,6 @@ const MainScreen = ({props, route, navigation}) => {
           onPress={UploadImage}
           disabled={isLoading}>
           <Text style={styles.text}>Upload File</Text>
-          <Image style={styles.buttonImage} source={IMG_UPLOAD} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={
-            !isLoading
-              ? styles.button
-              : [styles.button, {backgroundColor: 'gray'}]
-          }
-          onPress={UploadVideo}
-          disabled={isLoading}>
-          <Text style={styles.text}>Use Camera</Text>
           <Image style={styles.buttonImage} source={IMG_UPLOAD} />
         </TouchableOpacity>
       </View>
